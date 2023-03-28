@@ -1,0 +1,157 @@
+    /*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
+package servlet.cuentas;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
+
+/**
+ *
+ * @author farid
+ */
+@WebServlet(name = "CuentasList", urlPatterns = {"/CuentasList"})
+public class CuentasList extends HttpServlet {
+
+    //@EJB
+    private final DataAccessObjet.Cuentas cuenta = new DataAccessObjet.Cuentas();
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            String table = """
+                           <table class="table align-items-center mb-0">
+                            <thead>
+                              <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Nombre</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Saldo</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center ">Visible</th>
+                                <th class="text-secondary opacity-7"></th>
+                              </tr>
+                            </thead>
+                           <tbody>""";
+            
+            String alerts = "";
+            String attributes = (String) request.getAttribute("success");
+            if (attributes != null) {
+                alerts = "<div class=\"alert text-center alert-success\" role=\"alert\">" + attributes + "</div>";
+                request.removeAttribute("success");
+            }
+                
+            attributes = (String) request.getAttribute("danger");
+            if (attributes != null) {
+                alerts += "<div class=\"alert text-center alert-danger\" role=\"alert\">" + attributes + "</div>";
+                request.removeAttribute("danger");
+            }            
+            
+            List<Entities.Cuenta> elements = cuenta.getAll();
+            for(Entities.Cuenta element: elements) {
+                String esVisible;
+                if (element.getEsVisible()) {
+                    esVisible = "<span class=\"badge badge-sm bg-gradient-secondary\">Si</span>\n";
+                } else {
+                    esVisible = "<span class=\"badge badge-sm bg-gradient-light\">No</span>\n";
+                }
+
+                String esActivo;
+                if (element.getActivo()) {
+                    esActivo = "<a href=\"CuentasUpdate?element="+element.getId()+"\" class=\"btn btn-info\" data-toggle=\"tooltip\" data-original-title=\"edit\">\n" +
+"                                                              <i class=\"material-icons opacity-10\">edit</i>\n" +
+"                                                            </a>\n" +
+"                                                            <a href=\"CuentasInactivate?element="+element.getId()+"\" class=\"btn btn-danger\" data-toggle=\"tooltip\" data-original-title=\"disabled\">\n" +
+"                                                              <i class=\"material-icons opacity-10\">delete</i>\n" +
+"                                                            </a>";
+                } else {
+                    esActivo = "<a href=\"CuentasActivate?element="+element.getId()+"\" class=\"btn btn-success\" data-toggle=\"tooltip\" data-original-title=\"enabled\">\n" +
+"                                                              <i class=\"material-icons opacity-10\">done_outline</i>\n" +
+"                                                            </a>";
+                }
+
+                table += """
+                                             <tr>
+                                               <td>                        
+                                                 <h6 class="mb-0 text-sm">"""+element.getNombre()+"</h6>\n" +
+"                        <p class=\"text-xs text-secondary mb-0\">Ahorros</p>\n" +
+"                      </td>\n" +
+"                      <td>\n" +
+"                        <p class=\"text-xs font-weight-bold mb-0 text-center\">"+NumberFormat.getCurrencyInstance(new Locale("es", "CO"))
+    .format(element.getSaldo())+"</p>\n" +
+"                      </td>\n" +
+"                      <td class=\"align-middle text-center text-sm\">\n" +
+"                        "+esVisible+
+"                      </td>\n" +
+"                      <td class=\"align-middle  text-center\">\n" +
+"                        "+esActivo+"\n" +
+"                      </td>\n" +
+"                    </tr>";
+            }
+            
+            if (elements.isEmpty())
+                table += "<tr><td colspan=\"4\" class=\"text-center\"> No se encontraron registros </td></tr>";
+            table += """
+                                       </tbody>
+                                     </table>""";
+            /* TODO output your page here. You may use following sample code. */
+            out.println(helpers.Templates.ListElements("Cuentas", table, alerts, "CuentasCreate"));
+        } 
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+            processRequest(request, response);
+    }
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+            processRequest(request, response);
+    }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
+}
