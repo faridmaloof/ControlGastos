@@ -1,0 +1,85 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using GastosApp.Domain.Entities
+@inject SignInManager<Usuario> SignInManager
+@inject UserManager<Usuario> UserManager
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GastosApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/GastosApp.Web.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">GastosApp</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
+                        </li>
+                        
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="mantenimientosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Mantenimientos
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="mantenimientosDropdown">
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="TipoGasto" asp-action="Index">Tipos de Gasto</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="FondoMonetario" asp-action="Index">Fondos Monetarios</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="movimientosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Movimientos
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="movimientosDropdown">
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Presupuesto" asp-action="Index">Presupuesto</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="RegistroGasto" asp-action="Index">Registro de Gastos</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Deposito" asp-action="Index">Depósitos</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="consultasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Consultas y Reportes
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="consultasDropdown">
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Consulta" asp-action="Movimientos">Consulta Movimientos</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Consulta" asp-action="GraficoPresupuesto">Gráfico Presupuesto</a></li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                    @* Esta es la parte que maneja el login/logout/register y el "Hola Usuario" *@
+                    <partial name="_LoginPartial" /> 
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            © @DateTime.Now.Year - GastosApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

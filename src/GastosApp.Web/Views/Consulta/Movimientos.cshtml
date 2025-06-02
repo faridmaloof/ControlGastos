@@ -1,0 +1,71 @@
+﻿@model IEnumerable<GastosApp.Application.Dtos.MovimientoDto>
+
+@{
+    ViewData["Title"] = "Consulta de Movimientos";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Movimientos" method="get" class="row g-3 mb-3 align-items-end">
+    <div class="col-md-4">
+        <label for="fechaInicio" class="form-label">Desde:</label>
+        <input type="date" name="fechaInicio" id="fechaInicio" class="form-control" value="@ViewBag.FechaInicio" />
+    </div>
+    <div class="col-md-4">
+        <label for="fechaFin" class="form-label">Hasta:</label>
+        <input type="date" name="fechaFin" id="fechaFin" class="form-control" value="@ViewBag.FechaFin" />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Consultar</button>
+    </div>
+</form>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <div asp-validation-summary="ModelOnly"></div>
+    </div>
+}
+
+
+@if (!Model.Any() && ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-info mt-3">No hay movimientos registrados para el rango de fechas seleccionado.</div>
+}
+else if (Model.Any())
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Descripción</th>
+                <th>Fondo Monetario</th>
+                <th class="text-end">Ingreso</th>
+                <th class="text-end">Egreso</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        @if (item.TipoMovimiento == "Depósito")
+                        {
+                            <span class="badge bg-success">@item.TipoMovimiento</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">@item.TipoMovimiento</span>
+                        }
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.Descripcion)</td>
+                    <td>@Html.DisplayFor(modelItem => item.FondoMonetarioNombre)</td>
+                    <td class="text-end">@(item.Ingreso > 0 ? item.Ingreso.ToString("C") : "")</td>
+                    <td class="text-end">@(item.Egreso > 0 ? item.Egreso.ToString("C") : "")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

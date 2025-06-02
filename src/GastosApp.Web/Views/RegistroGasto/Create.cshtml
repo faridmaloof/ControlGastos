@@ -1,0 +1,175 @@
+﻿@model GastosApp.Application.Dtos.RegistroGastoInput
+
+@{
+    ViewData["Title"] = "Registrar Nuevo Gasto";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <h4>Encabezado del Gasto</h4>
+    <div class="row mb-3">
+        <div class="col-md-4 form-group">
+            <label asp-for="Fecha" class="control-label"></label>
+            <input asp-for="Fecha" type="date" class="form-control" />
+            <span asp-validation-for="Fecha" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 form-group">
+            <label asp-for="FondoMonetarioId" class="control-label">Fondo Monetario</label>
+            <select asp-for="FondoMonetarioId" class="form-select" asp-items="ViewBag.FondosMonetarios">
+                <option value="">-- Seleccione Fondo --</option>
+            </select>
+            <span asp-validation-for="FondoMonetarioId" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 form-group">
+            <label asp-for="TipoDocumento" class="control-label"></label>
+            <select asp-for="TipoDocumento" class="form-select" asp-items="ViewBag.TiposDocumento">
+                <option value="">-- Seleccione Tipo Documento --</option>
+            </select>
+            <span asp-validation-for="TipoDocumento" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6 form-group">
+            <label asp-for="NombreComercio" class="control-label"></label>
+            <input asp-for="NombreComercio" class="form-control" />
+            <span asp-validation-for="NombreComercio" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 form-group">
+            <label asp-for="Observaciones" class="control-label"></label>
+            <textarea asp-for="Observaciones" class="form-control" rows="2"></textarea>
+            <span asp-validation-for="Observaciones" class="text-danger"></span>
+        </div>
+    </div>
+
+    <hr />
+    <h4>Detalles del Gasto</h4>
+    <div id="detallesContainer">
+        @for (int i = 0; i < Model.Detalles.Count; i++)
+        {
+            <div class="row detalle-item mb-2 align-items-end">
+                <input type="hidden" asp-for="Detalles[i].TipoGastoId" class="tipo-gasto-id-hidden" />
+                <!-- Campo oculto para el ID -->
+                <div class="col-md-5 form-group">
+                    @if (i == 0)
+                    {
+                        <label class="form-label">Tipo de Gasto</label>
+                    }
+                    <select asp-for="Detalles[i].TipoGastoId" class="form-select tipo-gasto-select"
+                        asp-items="ViewBag.TiposGasto">
+                        <option value="">-- Seleccione Tipo --</option>
+                    </select>
+                    <span asp-validation-for="Detalles[i].TipoGastoId" class="text-danger"></span>
+                </div>
+                <div class="col-md-4 form-group">
+                    @if (i == 0)
+                    {
+                        <label class="form-label">Monto</label>
+                    }
+                    <input asp-for="Detalles[i].Monto" type="number" step="0.01" class="form-control monto-input"
+                        placeholder="0.00" />
+                    <span asp-validation-for="Detalles[i].Monto" class="text-danger"></span>
+                </div>
+                <div class="col-md-2">
+                    @if (i == 0 && Model.Detalles.Count > 1)
+                    {
+                        <label class="form-label d-block"> </label>
+                    }
+                    else if (i > 0 || Model.Detalles.Count == 1 && i == 0)
+                    {
+
+                        <label class="form-label d-block"> </label>
+                    }
+
+                    @if (Model.Detalles.Count > 1 || i > 0)
+                    {
+                        <button type="button" class="btn btn-danger btn-sm remove-detalle w-100">Quitar</button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-danger btn-sm remove-detalle w-100"
+                            style="display:none;">Quitar</button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+    <div class="mb-3">
+        <button type="button" id="addDetalle" class="btn btn-success btn-sm">
+            <i class="fas fa-plus"></i> Agregar Otro Detalle
+        </button>
+    </div>
+    <span asp-validation-for="Detalles" class="text-danger"></span> <!-- Para error general de MinLength -->
+
+
+    <hr />
+    <div class="form-group mt-3">
+        <input type="submit" value="Guardar Gasto" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            let detalleIndex = @Model.Detalles.Count;
+
+            function updateRemoveButtons() {
+                if ($(".detalle-item").length <= 1) {
+                    $(".remove-detalle").hide();
+                } else {
+                    $(".remove-detalle").show();
+                }
+            }
+
+            $("#addDetalle").click(function () {
+                var container = $("#detallesContainer");
+                var newDetalleHtml = `
+                        <div class="row detalle-item mb-2 align-items-end">
+                            <div class="col-md-5 form-group">
+                                <select name="Detalles[${detalleIndex}].TipoGastoId" class="form-select tipo-gasto-select">
+                                    <option value="">-- Seleccione Tipo --</option>
+                                    @foreach (var tipo in (IEnumerable<SelectListItem>)ViewBag.TiposGasto)
+                                    {
+                                            <option value="@tipo.Value">@tipo.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <input name="Detalles[${detalleIndex}].Monto" type="number" step="0.01" class="form-control monto-input" placeholder="0.00" />
+                            </div>
+                            <div class="col-md-2">
+                                 <button type="button" class="btn btn-danger btn-sm remove-detalle w-100">Quitar</button>
+                            </div>
+                        </div>`;
+                container.append(newDetalleHtml);
+                detalleIndex++;
+                updateRemoveButtons();
+            });
+
+            $("#detallesContainer").on("click", ".remove-detalle", function () {
+                $(this).closest(".detalle-item").remove();
+
+                $("#detallesContainer .detalle-item").each(function (idx, item) {
+                    $(item).find("select, input").each(function () {
+                        var currentName = $(this).attr("name");
+                        if (currentName) {
+                            var newName = currentName.replace(/Detalles\[\d+\]/, `Detalles[${idx}]`);
+                            $(this).attr("name", newName);
+                        }
+                    });
+                });
+                detalleIndex = $("#detallesContainer .detalle-item").length;
+
+                updateRemoveButtons();
+            });
+            updateRemoveButtons();
+        });
+    </script>
+}

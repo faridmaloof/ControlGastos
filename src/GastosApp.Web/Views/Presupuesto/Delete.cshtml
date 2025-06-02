@@ -1,0 +1,32 @@
+﻿@model GastosApp.Domain.Entities.PresupuestoMensual
+
+@{
+    ViewData["Title"] = "Eliminar Presupuesto";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<h3>¿Está seguro de que desea eliminar este presupuesto?</h3>
+<div>
+    <h4>Presupuesto para @(new DateTime(2000, Model.Mes, 1).ToString("MMMM")) de @Model.Anio</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Tipo de Gasto</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.TipoGasto.Nombre)</dd>
+
+        <dt class="col-sm-3">Monto Presupuestado</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.MontoPresupuestado)</dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
+        <a asp-action="Index" asp-route-anio="@Model.Anio" asp-route-mes="@Model.Mes"
+            class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

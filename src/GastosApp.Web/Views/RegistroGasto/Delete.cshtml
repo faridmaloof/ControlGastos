@@ -1,0 +1,29 @@
+﻿@model GastosApp.Domain.Entities.RegistroGasto
+
+@{
+    ViewData["Title"] = "Eliminar Gasto";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h3>¿Está seguro de que desea eliminar este gasto del @Model.Fecha.ToString("dd/MM/yyyy")?</h3>
+<p>Comercio: @Model.NombreComercio</p>
+<p>Total: @Model.Detalles.Sum(d => d.Monto).ToString("C")</p>
+<div>
+    <hr />
+    <h4>Detalles a eliminar:</h4>
+    @if (Model.Detalles != null && Model.Detalles.Any())
+    {
+        <ul>
+            @foreach (var detalle in Model.Detalles)
+            {
+                <li>@detalle.TipoGasto.Nombre: @detalle.Monto.ToString("N2")</li>
+            }
+        </ul>
+    }
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Eliminar Definitivamente" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

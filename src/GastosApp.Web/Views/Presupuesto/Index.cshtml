@@ -1,0 +1,68 @@
+﻿@model IEnumerable<GastosApp.Domain.Entities.PresupuestoMensual>
+
+@{
+    ViewData["Title"] = "Presupuestos Mensuales";
+    var anioSeleccionado = ViewBag.AnioSeleccionado ?? DateTime.Now.Year;
+    var mesSeleccionado = ViewBag.MesSeleccionado ?? DateTime.Now.Month;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Index" method="get" class="row g-3 mb-3 align-items-end">
+    <div class="col-md-3">
+        <label for="anio" class="form-label">Año:</label>
+        <select name="anio" id="anio" class="form-select" asp-items="ViewBag.Anios" asp-for="@anioSeleccionado"></select>
+    </div>
+    <div class="col-md-3">
+        <label for="mes" class="form-label">Mes:</label>
+        <select name="mes" id="mes" class="form-select" asp-items="ViewBag.Meses" asp-for="@mesSeleccionado"></select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-info w-100">Filtrar</button>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a asp-action="CrearOEditar" asp-route-anio="@anioSeleccionado" asp-route-mes="@mesSeleccionado" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nuevo Presupuesto para @(new DateTime(2000, mesSeleccionado, 1).ToString("MMMM")) @anioSeleccionado
+        </a>
+    </div>
+</form>
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay presupuestos registrados para @(new DateTime(2000, mesSeleccionado, 1).ToString("MMMM")) de @anioSeleccionado.</div>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Tipo de Gasto</th>
+                <th>Monto Presupuestado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.TipoGasto.Nombre)</td>
+                    <td>@Html.DisplayFor(modelItem => item.MontoPresupuestado)</td>
+                    <td>
+                        <a asp-action="CrearOEditar" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Editar</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

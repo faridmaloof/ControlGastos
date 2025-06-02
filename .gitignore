@@ -1,0 +1,57 @@
+# Build results
+bin/
+obj/
+out/
+Generated/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ASP.NET Core secrets
+**/appsettings.*.json
+**/secrets.json
+
+# Rider and VS Code
+.idea/
+.vscode/
+*.code-workspace
+
+# LibMan (Library Manager)
+wwwroot/lib/
+lib/
+
+# Node (if you use npm/yarn for frontend)
+node_modules/
+
+# Logs
+*.log
+
+# VS + dotnet tooling
+*.vs/
+*.dbmdl
+*.pidb
+*.psess
+*.vsp
+*.vspx
+*.pdb
+*.cache
+
+# Backup & temporary files
+*.bak
+*.tmp
+*.swp
+*.orig
+*.rej
+
+# NuGet Packages
+*.nupkg
+packages/
+
+# Publish output
+publish/
+wwwroot/dist/
+
+

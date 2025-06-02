@@ -1,0 +1,33 @@
+﻿@model GastosApp.Domain.Entities.Deposito
+
+@{
+    ViewData["Title"] = "Eliminar Depósito";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<h3>¿Está seguro de que desea eliminar este depósito?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Fecha</dt>
+        <dd class="col-sm-9">@Model.Fecha.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">Fondo Monetario</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.FondoMonetario.Nombre)</dd>
+
+        <dt class="col-sm-3">Monto</dt>
+        <dd class="col-sm-9">@Model.Monto.ToString("C")</dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Eliminar Definitivamente" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

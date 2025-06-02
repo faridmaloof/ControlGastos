@@ -1,0 +1,110 @@
+﻿@model GastosApp.Application.Dtos.DatosGraficoPresupuestoDto
+
+@{
+    ViewData["Title"] = "Gráfico Comparativo: Presupuesto vs. Ejecución";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="GraficoPresupuesto" method="get" class="row g-3 mb-4 align-items-end">
+    <div class="col-md-4">
+        <label for="fechaInicio" class="form-label">Desde:</label>
+        <input type="date" name="fechaInicio" id="fechaInicio" class="form-control" value="@ViewBag.FechaInicio" />
+    </div>
+    <div class="col-md-4">
+        <label for="fechaFin" class="form-label">Hasta:</label>
+        <input type="date" name="fechaFin" id="fechaFin" class="form-control" value="@ViewBag.FechaFin" />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Generar Gráfico</button>
+    </div>
+</form>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <div asp-validation-summary="ModelOnly"></div>
+    </div>
+}
+
+@if (Model != null && Model.LabelsTiposGasto.Any() && ViewData.ModelState.IsValid)
+{
+    <div style="max-width: 800px; margin: auto;">
+        <canvas id="presupuestoEjecucionChart"></canvas>
+    </div>
+}
+else if (ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-info">No hay datos para mostrar en el gráfico para el rango seleccionado.</div>
+}
+
+
+@section Scripts {
+    <!-- Incluir Chart.js desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    @if (Model != null && Model.LabelsTiposGasto.Any())
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const ctx = document.getElementById('presupuestoEjecucionChart').getContext('2d');
+                const presupuestoEjecucionChart = new Chart(ctx, {
+                    type: 'bar', 
+                    data: {
+                        labels: @Html.Raw(Json.Serialize(Model.LabelsTiposGasto)),
+                        datasets: [
+                            {
+                                label: 'Presupuestado',
+                                data: @Html.Raw(Json.Serialize(Model.MontosPresupuestados)),
+                                backgroundColor: 'rgba(54, 162, 235, 0.5)', 
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Ejecutado (Gastado)',
+                                data: @Html.Raw(Json.Serialize(Model.MontosEjecutados)),
+                                backgroundColor: 'rgba(255, 99, 132, 0.5)', 
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    
+                                    callback: function (value, index, values) {
+                                        return '$' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(context.parsed.y); 
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+    }
+}
